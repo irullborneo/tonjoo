@@ -15,6 +15,14 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## FVM:
+Project menggunakan flutter 3.0.0 dan menggunakan FVM.
+
 ## Generate file services
 untuk generate file silahkan run command dibawah
 flutter pub run build_runner build
+
+## Run with Vscode:
+- Open Run & Debug menu
+- Select app launch
+- Run / Run without debuging
