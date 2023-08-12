@@ -46,3 +46,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .env
+
+lib/core/*/*.g.dart
+lib/module/*/domain/*/*.g.dart
+lib/module/*/data/models/*.g.dart
+lib/core/datasource/remote/*.g.dart
