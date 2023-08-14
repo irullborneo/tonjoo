@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tonjoo/core/helpers/common_helper.dart';
 import 'package:tonjoo/core/utils/tj_colors.dart';
 import 'package:tonjoo/core/utils/tj_styles.dart';
 import 'package:tonjoo/core/widgets/tj_avatar_file.dart';
@@ -18,7 +19,7 @@ class UserManagementTile extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
       child: Row(
         children: [
-          data.id == null
+          CommonHelper.isLocaleImage(data.avatar)
               ? TjAvatarFile(
                   path: data.avatar,
                   radius: 35.w,
