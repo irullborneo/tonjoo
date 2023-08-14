@@ -1,11 +1,11 @@
 class ListSchema {
-  final int limit;
-  final int offset;
+  final int? limit;
+  final int? offset;
   final String? query;
 
   const ListSchema({
-    required this.limit,
-    required this.offset,
+    this.limit,
+    this.offset,
     this.query
   });
 }

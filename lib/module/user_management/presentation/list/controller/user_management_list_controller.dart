@@ -72,9 +72,8 @@ class UserManagementListController extends GetxController {
   }
 
   Future<void> _initLocalData() async {
-    final res = await _locale.call(ListSchema(
-        limit: 50, offset: _localUser.length, query: _searchData.value));
-    res.fold((l) => null, (r) => _localUser.addAll(r));
+    final res = await _locale.call(ListSchema(query: _searchData.value));
+    res.fold((l) => null, (r) => _localUser.value = r);
   }
 
   Future<List<UserModel>> _initRemoteData() async {
