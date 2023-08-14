@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tonjoo/config/routes/tj_pages.dart';
 import 'package:tonjoo/config/themes/tj_theme.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:tonjoo/core/services/sql_service.dart';
 
 import 'di/injector.dart';
 
@@ -21,6 +22,9 @@ Future<void> main() async {
 
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  final database = SqlService();
+  await database.init();
 
   await dotenv.load(fileName: '.env');
   await GetStorage.init();

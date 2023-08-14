@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:tonjoo/core/databases/user_db.dart';
 
 class UserEntity extends Equatable {
   final String? id;
@@ -15,6 +16,17 @@ class UserEntity extends Equatable {
       required this.firstName,
       required this.avatar,
       required this.gender});
+
+  factory UserEntity.fromLocale(UserDB user){
+    return UserEntity(
+      id: user.id,
+      firstName: user.firstname,
+      lastName: user.lastName,
+      email: user.email,
+      gender: user.gender,
+      avatar: user.avatar
+    );
+  }
 
   String fullName() {
     String name = firstName??"";

@@ -1,42 +1,94 @@
-import 'package:get_storage/get_storage.dart';
-import 'package:tonjoo/core/constants/storage_key_constant.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:tonjoo/core/databases/user_db.dart';
+import 'package:tonjoo/core/schema/list_schema.dart';
+import 'package:tonjoo/core/services/sql_service.dart';
 import 'package:tonjoo/module/user_management/data/models/user_model.dart';
 import 'package:tonjoo/module/user_management/domain/entities/user_entity.dart';
 
 abstract class UserLocale {
   factory UserLocale() = _UserLocale;
-  List<UserEntity> getList();
-  void add(UserModel user);
-  void removeAt(int index);
+  Future<List<UserEntity>> fetch(ListSchema query);
+  Future<void> insert(UserModel user);
+  Future<void> insertAll(List<UserModel> users);
+  Future<int> count();
+  Future<void> delete(String index);
+  Future<void> clear();
 }
 
 class _UserLocale implements UserLocale {
-  final _key = StorageKeyConst.userList;
-  final _storage = GetStorage();
+  final db = SqlService.database;
 
   @override
-  void add(UserModel user) {
-    List raw = _storage.read<List>(_key) ?? [];
-    raw.add(user.toJson());
-    _storage.write(
-      _key,
-      raw,
+  Future<void> insert(UserModel user) async {
+    Batch batch = db.batch();
+    UserDB data = UserDB.fromUserModel(user);
+
+    batch.insert(
+      UserDB.tableName,
+      data.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    await batch.commit(noResult: true);
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    await db.delete(
+      UserDB.tableName,
+      where: '${UserDB.idField} = ?',
+      whereArgs: [id],
     );
   }
 
   @override
-  List<UserEntity> getList() {
-    final List list = _storage.read<List>(_key) ?? [];
-    return list.map((e) => UserModel.fromJson(e)).toList();
+  Future<void> insertAll(List<UserModel> users) async {
+    Batch batch = db.batch();
+    for (UserModel user in users) {
+      UserDB data = UserDB.fromUserModel(user);
+      batch.insert(
+        UserDB.tableName,
+        data.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 
   @override
-  void removeAt(int index) {
-    List raw = _storage.read(_key) ?? [];
-    raw.removeAt(index);
-    _storage.write(
-      _key,
-      raw,
+  Future<List<UserEntity>> fetch(ListSchema schema) async {
+    final List<Map<String, dynamic>>
+    maps = await db.query(
+      UserDB.tableName,
+      where: '${UserDB.firstNameField} LIKE ?',
+      whereArgs: ['%${schema.query}%'],
+    );
+
+    List<UserDB> list = List.generate(maps.length, (i) {
+      return UserDB(
+        id: maps[i][UserDB.idField],
+        firstname: maps[i][UserDB.firstNameField],
+        lastName: maps[i][UserDB.lastNameField],
+        email: maps[i][UserDB.emailField],
+        gender: maps[i][UserDB.genderField],
+        avatar: maps[i][UserDB.avatarField],
+      );
+    });
+
+    return list.map<UserEntity>((e) => UserEntity.fromLocale(e)).toList();
+  }
+
+  @override
+  Future<int> count() async {
+    int count = Sqflite.firstIntValue(
+            await db.rawQuery('SELECT COUNT(*) FROM ${UserDB.tableName}')) ??
+        0;
+    return count;
+  }
+
+  @override
+  Future<void> clear() async {
+    await db.delete(
+      UserDB.tableName,
     );
   }
 }

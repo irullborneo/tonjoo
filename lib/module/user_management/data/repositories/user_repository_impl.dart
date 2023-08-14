@@ -17,7 +17,7 @@ class UserRepositoryImpl implements UserRepository {
   const UserRepositoryImpl(this._userLocale, this._userRemote);
 
   @override
-  Future<Either<Failure, List<UserEntity>>> lists(ListSchema schema)async {
+  Future<Either<Failure, List<UserModel>>> lists(ListSchema schema)async {
     try {
       final res = await _userRemote.list();
       final List raw = res.data ?? [];
@@ -34,20 +34,33 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<Failure, Success>> addLocale(UserSchema schema)async {
     UserModel user = UserModel.fromSchema(schema);
-    _userLocale.add(user);
+    _userLocale.insert(user);
     return const Right(Success(
       message: "Data saved"
     ));
   }
 
   @override
-  Future<Either<Failure, Success>> removeLocale(int index)async {
-    _userLocale.removeAt(index);
+  Future<Either<Failure, Success>> removeLocale(String id)async {
+    await _userLocale.delete(id);
     return const Right(Success(message: "Data deleted"));
   }
 
   @override
-  Future<Either<Failure, List<UserEntity>>> listsLocale()async {
-    return Right(_userLocale.getList());
+  Future<Either<Failure, List<UserEntity>>> fetch(ListSchema schema)async {
+    return Right(await _userLocale.fetch(schema));
+  }
+
+  @override
+  Future<Either<Failure, int>> countLocale()async {
+    return Right(await _userLocale.count());
+  }
+
+  @override
+  Future<Either<Failure, Success>> addAllLocale(List<UserModel> data)async {
+    _userLocale.insertAll(data);
+    return const Right(Success(
+        message: "Data saved"
+    ));
   }
 }
